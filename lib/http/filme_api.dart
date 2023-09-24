@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:uniflix/model/filme.dart';
 
 class FilmeApi {
@@ -55,6 +56,9 @@ class FilmeApi {
   ]
 ''';
 
+  String apiUrl =
+      'https://my-json-server.typicode.com/jeancarlospaula/fake_api/db';
+
   Future<List<Filme>> getFilmesOffline() async {
     final json = jsonDecode(respostaApi);
 
@@ -70,5 +74,58 @@ class FilmeApi {
     await Future.delayed(const Duration(seconds: 1));
 
     return listFilmes;
+  }
+
+  Future<List<Filme>> getFilmes() async {
+    final response = await http.get(Uri.parse(apiUrl));
+    print(response.body);
+    if (response.statusCode != 200) {
+      throw Exception('Erro ao obter dados da API');
+    }
+
+    final json = jsonDecode(response.body);
+    final mapsFilme = json.cast<Map<String, dynamic>>();
+
+    List<Filme> listFilmes = [];
+
+    for (var filme in mapsFilme) {
+      Filme filmeObj = Filme.fromJson(filme);
+      listFilmes.add(filmeObj);
+    }
+
+    return listFilmes;
+  }
+
+  // Método para obter a lista de personagens da API online
+  Future<List<Filme>> getFilmes2() async {
+    // Faz uma requisição HTTP GET à API
+    final response = await http.get(Uri.parse(apiUrl));
+
+    // Verifica se a requisição foi bem-sucedida (código de status 200)
+    if (response.statusCode == 200) {
+      // Decodifica o JSON da resposta e extrai a lista de personagens
+      final json = jsonDecode(response.body);
+      final mapsPersonagens = json.cast<Map<String, dynamic>>();
+
+      // Lista para armazenar os objetos Personagem
+      List<Filme> listFilme = [];
+
+      // Converte cada mapa de personagem em um objeto Personagem
+      for (var map in mapsPersonagens) {
+        // Cria um objeto Personagem usando o método fromJson
+        Filme filme = Filme.fromJson(map);
+
+        // Atualiza o URL do avatar com parâmetros de autenticação
+
+        // Adiciona o personagem à lista
+        listFilme.add(filme);
+      }
+
+      // Retorna a lista de personagens obtida da API
+      return listFilme;
+    } else {
+      // Caso a requisição não seja bem-sucedida, lança uma exceção
+      throw Exception('Falha ao obter informações da API');
+    }
   }
 }

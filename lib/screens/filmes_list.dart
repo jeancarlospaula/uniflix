@@ -20,7 +20,8 @@ class _FilmesListState extends State<FilmesList> {
   // Método para obter os filmes a partir da API.
   getFilmes() async {
     FilmeApi api = FilmeApi();
-    final filmes = await api.getFilmesOffline();
+    //final filmes = await api.getFilmesOffline();
+    final filmes = await api.getFilmes2();
     for (var filme in filmes) {
       print(filme);
     }
